@@ -1,11 +1,10 @@
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, Suspense } from "react";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import Typography from "@mui/material/Typography";
 import styled from "styled-components";
 import AddCityModal from "../components/AddCityModal";
 import { toast } from "react-toastify";
-import List from "@mui/material/List";
 
 const CityList = React.lazy(() => import("../components/CityList"));
 
