@@ -1,10 +1,11 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useContext } from "react";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import Typography from "@mui/material/Typography";
 import styled from "styled-components";
 import AddCityModal from "../components/AddCityModal";
 import { toast } from "react-toastify";
+import { CitiesContext } from "../context/CityContext";
 
 const CityList = React.lazy(() => import("../components/CityList"));
 
@@ -27,9 +28,7 @@ const StyledDiv = styled.div`
 `;
 
 const Home = () => {
-	const [cities, setCities] = useState(
-		new Set(["Amsterdam", "New York", "Berlin"])
-	);
+	const { cities, onAddCity } = useContext(CitiesContext);
 
 	const [open, setOpen] = useState(false);
 
@@ -49,7 +48,8 @@ const Home = () => {
 			return str.toUpperCase();
 		});
 
-		setCities((prevState) => new Set(prevState).add(capitalizedCity.trim()));
+		onAddCity(capitalizedCity);
+
 		setOpen(false);
 		setCity("");
 		toast.success("City successfully added!");

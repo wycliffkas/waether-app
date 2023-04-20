@@ -8,9 +8,14 @@ import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import Box from "@mui/material/Box";
-import { getCityData, getHourlyWeatherForecast } from "../api/weather";
+import {
+	getCityData,
+	getHourlyWeatherForecast,
+	getWeeklyWeatherForecast
+} from "../api/weather";
 import HourlyWeatherChart from "../components/HourlyWeatherChart";
 import HourlyWeatherForecast from "../components/HourlyWeatherForecast";
+import WeeklyWeatherForecast from "../components/WeeklyWeatherForecast";
 
 const Container = styled.div`
 	margin: auto;
@@ -34,17 +39,26 @@ const StyledBox = styled(Box)`
 	border-color: divider;
 `;
 
+const StyledParagraph = styled.p`
+	text-align: center;
+	font-size: 16px;
+	margin-top: 30px;
+`;
+
 const City = () => {
 	const { cityName } = useParams();
+
 	let history = useHistory();
 
-	const [hourlyForecastData, sethourlyForecastData] = useState([]);
+	const [hourlyForecastData, setHourlyForecastData] = useState([]);
+
+	const [weeklyForecastData, setWeeklyForecastData] = useState([]);
 
 	const [value, setValue] = useState("1");
 
 	const [isloading, setIsLoading] = useState(false);
 
-	const handleChange = (event, newValue) => {
+	const handleTabChange = (event, newValue) => {
 		setValue(newValue);
 	};
 
@@ -55,18 +69,27 @@ const City = () => {
 				location: cityName
 			});
 
+			const cityId = cityDetails.data.location[0].id;
+
 			const hourlyForecastResponse = await getHourlyWeatherForecast({
-				location: cityDetails.data.location[0].id
+				location: cityId
 			});
 
-			sethourlyForecastData(hourlyForecastResponse.data.hourly);
+			setHourlyForecastData(hourlyForecastResponse.data.hourly);
+
+			const weeklyForecastResponse = await getWeeklyWeatherForecast({
+				location: cityId
+			});
+
+			setWeeklyForecastData(weeklyForecastResponse.data.daily);
+
 			setIsLoading(false);
 		};
 		fetchData();
 	}, [cityName]);
 
 	if (isloading) {
-		return <div>Loading...</div>;
+		return <StyledParagraph>Loading data...</StyledParagraph>;
 	}
 
 	return (
@@ -81,13 +104,15 @@ const City = () => {
 			</StyledButton>
 
 			<Container>
-				<div>{cityName}</div>
+				<h3>{cityName}</h3>
 
-				<Box mt={2}>Week mood:</Box>
+				<Box mt={3} mb={2}>Week mood:</Box>
 
 				<TabContext value={value}>
 					<StyledBox>
-						<TabList onChange={handleChange} aria-label="lab API tabs example">
+						<TabList
+							onChange={handleTabChange}
+							aria-label="lab API tabs example">
 							<Tab label="Hourly" value="1" />
 							<Tab label="7-day forecast" value="2" />
 						</TabList>
@@ -98,7 +123,9 @@ const City = () => {
 
 						<HourlyWeatherForecast hourlyForecastData={hourlyForecastData} />
 					</TabPanel>
-					<TabPanel value="2">Item Two</TabPanel>
+					<TabPanel value="2">
+						<WeeklyWeatherForecast weeklyForecastData={weeklyForecastData} />
+					</TabPanel>
 				</TabContext>
 			</Container>
 		</>
