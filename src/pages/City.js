@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import Button from "@mui/material/Button";
 import ArrowBack from "@mui/icons-material/ArrowBack";
@@ -59,13 +59,16 @@ const City = () => {
 
 	const [isloading, setIsLoading] = useState(false);
 
+	const [error, setError] = useState("");
+
 	const handleTabChange = (event, newValue) => {
 		setValue(newValue);
 	};
 
-	useEffect(() => {
-		const fetchData = async () => {
+	const fetchWeatherData = useCallback(async () => {
+		try {
 			setIsLoading(true);
+
 			const cityDetails = await getCityData({
 				location: cityName
 			});
@@ -83,16 +86,25 @@ const City = () => {
 			});
 
 			setWeeklyForecastData(weeklyForecastResponse.data.daily);
-
 			setIsLoading(false);
-		};
-		fetchData();
+		} catch (error) {
+			setError(error.message);
+			setIsLoading(false);
+		}
 	}, [cityName]);
+
+	useEffect(() => {
+		fetchWeatherData();
+	}, [cityName, fetchWeatherData]);
 
 	const weeklyWeatherMood = getWeeklyWeatherMood(weeklyForecastData);
 
 	if (isloading) {
 		return <StyledParagraph>Loading data...</StyledParagraph>;
+	}
+
+	if (error) {
+		return <div>{`Error:${error}`}</div>;
 	}
 
 	return (
