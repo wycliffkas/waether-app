@@ -16,6 +16,7 @@ import {
 import HourlyWeatherChart from "../components/HourlyWeatherChart";
 import HourlyWeatherForecast from "../components/HourlyWeatherForecast";
 import WeeklyWeatherForecast from "../components/WeeklyWeatherForecast";
+import getWeeklyWeatherMood from "../utils/getWeeklyWeatherMood";
 
 const Container = styled.div`
 	margin: auto;
@@ -88,6 +89,8 @@ const City = () => {
 		fetchData();
 	}, [cityName]);
 
+	const weeklyWeatherMood = getWeeklyWeatherMood(weeklyForecastData);
+
 	if (isloading) {
 		return <StyledParagraph>Loading data...</StyledParagraph>;
 	}
@@ -106,7 +109,7 @@ const City = () => {
 			<Container>
 				<h3>{cityName}</h3>
 
-				<Box mt={3} mb={2}>Week mood:</Box>
+				<Box mt={3} mb={2}>{`Week mood: ${weeklyWeatherMood}`}</Box>
 
 				<TabContext value={value}>
 					<StyledBox>
